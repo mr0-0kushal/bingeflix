@@ -113,6 +113,8 @@ const SignUp = () => {
               type="number"
               placeholder="Phone number"
               required
+              minLength={10}
+              maxLength={10}
               value={phone}
               onChange={(e) => {
                 setPhone(e.target.value)
