@@ -61,13 +61,33 @@ export const AuthProvider = ({ children }) => {
     return res;
   };
 
-  const logout = async (token) => {
-    const isLogout = await axios.post(`${LOCAL_SERVER}/users/logout`, {}, { withCredentials: true, headers: { 'Authorization': `Bearer ${token}` } });
-    localStorage.removeItem("accessToken");
-    setAccessToken(null);
-    setUser(null);
-    return isLogout ? true : false
+  const logout = async () => {
+    const token = localStorage.getItem('accessToken'); // Make sure it's not null
+
+    if (!token) {
+      console.warn("No token found for logout");
+      return false;
+    }
+
+    try {
+      const res = await axios.post(`${LOCAL_SERVER}/users/logout`, {}, {
+        withCredentials: true,
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+
+      localStorage.removeItem("accessToken");
+      setAccessToken(null);
+      setUser(null);
+
+      return res.status === 200;
+    } catch (error) {
+      console.error("Logout failed:", error);
+      return false;
+    }
   };
+
 
   const refreshToken = async () => {
     try {
@@ -93,7 +113,7 @@ export const AuthProvider = ({ children }) => {
 
   const verifyOTP = async (formData) => {
     try {
-      const res = await axios.post(`${LOCAL_SERVER}/users/verify-otp`, formData, { withCredentials: true , headers: { 'Authorization': `Bearer ${token}` }})
+      const res = await axios.post(`${LOCAL_SERVER}/users/verify-otp`, formData, { withCredentials: true, headers: { 'Authorization': `Bearer ${token}` } })
       // console.log(res)
       const { accessToken } = res.data.data;
       localStorage.setItem("accessToken", accessToken);
