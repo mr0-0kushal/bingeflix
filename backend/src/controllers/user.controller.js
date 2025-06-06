@@ -341,27 +341,27 @@ const updateUserAvatar = asyncHandler(async (req, res) => {
 })
 
 const sendUserOTP = asyncHandler(async (req, res) => {
-    const { emails, phone, username } = req.body
-    if (!(emails || phone || username)) {
+    const { email, phone, username } = req.body
+    if (!(email || username)) {
         return res.status(400).json(new ApiError(400, {
             message: "Email or username is required"
         }, "Username or email is required"))
     }
     const user = await User.findOne({
-        $or: [{ phone }, { emails }, { username }]
+        $or: [ { email }, { username }]
     })
     if (!user) {
         return res.status(400).json(new ApiError(400, {
             message: "User not Found with this email or username"
         }, "User not found!"))
     }
-    const email = user.email
+    const emails = user.email
     // generate OTP
     const generatedOTP = generateOTP(true, false, false, false)
     // console.log(generatedOTP)
 
     // storing otp to redis
-    await client.set(`otp:${email}`, generatedOTP, {
+    await client.set(`otp:${emails}`, generatedOTP, {
         EX: 120
     })
 
@@ -376,8 +376,8 @@ const sendUserOTP = asyncHandler(async (req, res) => {
         }
     }
     // Send OTP Email
-    if (email) {
-        const isEmailOtp = await sendOTPEmail(email, user.fullname, generatedOTP)
+    if (emails) {
+        const isEmailOtp = await sendOTPEmail(emails, user.fullname, generatedOTP)
         if (!isEmailOtp) {
             return res
                 .status(500)

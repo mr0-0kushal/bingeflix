@@ -38,7 +38,7 @@ const Login = () => {
       setMessage({})
       const formData = {
         username: username,
-        emails: email,
+        email: email,
         phone: phone
       }
       await sendOTP(formData); // API call
