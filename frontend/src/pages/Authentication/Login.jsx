@@ -1,4 +1,5 @@
 import React from 'react'
+import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { useRef, useState, useEffect } from 'react';
 import { Outlet, useNavigate, Link } from 'react-router-dom'
 import { login2, login } from '../../context/imageData';
@@ -11,6 +12,14 @@ import OTPInput from './LoginWithOTP.jsx';
 const Login = () => {
 
   const { login, sendOTP } = useAuth();
+
+  const [showPassword, setShowPassword] = useState(false);
+
+  const handleMouseDown = () => setShowPassword(true);
+  const handleMouseUp = () => setShowPassword(false);
+  const handleMouseLeave = () => setShowPassword(false);
+  const handleTouchStart = () => setShowPassword(true);
+  const handleTouchEnd = () => setShowPassword(false);
 
   const navigate = useNavigate()
   const [showOTP, setShowOTP] = useState(false)
@@ -142,19 +151,32 @@ const Login = () => {
               }}
               className="border-b border-white outline-none pr-5 pl-1 pt-3 lg:text-lg text-white font-bold shadow-black placeholder-white"
             />
-            <input
-              type="password"
-              name='passoword'
-              id='password'
-              minLength={6}
-              maxLength={10}
-              value={password}
-              onChange={(e) => {
-                setPassword(e.target.value)
-              }}
-              placeholder='Create password'
-              required
-              className='border-b border-white outline-none pr-5 pl-1 pt-3 lg:text-lg text-white font-bold shadow-black placeholder-white bg-transparent' />
+            <span>
+              <input
+                type={showPassword ? 'text' : 'password'}
+                name='passoword'
+                id='password'
+                minLength={6}
+                maxLength={10}
+                value={password}
+                onChange={(e) => {
+                  setPassword(e.target.value)
+                }}
+                placeholder='Enter password'
+                required
+                className='border-b border-white outline-none pr-5 pl-1 pt-3 lg:text-lg text-white font-bold shadow-black placeholder-white bg-transparent' />
+              <button
+                type="button"
+                onMouseDown={handleMouseDown}
+                onMouseUp={handleMouseUp}
+                onMouseLeave={handleMouseLeave}
+                onTouchStart={handleTouchStart}
+                onTouchEnd={handleTouchEnd}
+                className='absolute top-auto bottom-auto right-2'
+              >
+                {showPassword ? (<FaEyeSlash size={25} />) : (<FaEye size={25} />)}
+              </button>
+            </span>
             {loading ? (
               <ClipLoader color="white" loading={true} size={40} />
             ) : (
