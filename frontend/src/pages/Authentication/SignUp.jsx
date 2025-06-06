@@ -74,9 +74,9 @@ const SignUp = () => {
   return (
     <div className="flex flex-col items-center px-5 pt-6 h-screen min-w-full 2xl:justify-center">
       <div className="w-[95%] h-auto lg:w-[70%] rounded-2xl p-4 flex justify-between bg-[var(--color-primary)] ">
-        <div className="lg:flex flex-col items-center lg:w-[40%] p-4 justify-center hidden">
-          <div>
-            <img src={welcome} alt="" />
+        <div className="lg:flex flex-col items-center lg:w-[50%] p-4 justify-center hidden">
+          <div className='w-full h-full flex items-center justify-center ml-20'>
+            {/* <img src={welcome} alt="" /> */}
             <img src={signup} alt="" />
           </div>
         </div>
