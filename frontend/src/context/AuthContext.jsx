@@ -113,7 +113,7 @@ export const AuthProvider = ({ children }) => {
 
   const verifyOTP = async (formData) => {
     try {
-      const res = await axios.post(`${LOCAL_SERVER}/users/verify-otp`, formData, { withCredentials: true, headers: { 'Authorization': `Bearer ${token}` } })
+      const res = await axios.post(`${LOCAL_SERVER}/users/verify-otp`, formData, { withCredentials: true })
       // console.log(res)
       const { accessToken } = res.data.data;
       localStorage.setItem("accessToken", accessToken);
