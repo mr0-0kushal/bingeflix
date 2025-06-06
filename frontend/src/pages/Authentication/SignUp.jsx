@@ -110,7 +110,8 @@ const SignUp = () => {
               className="border-b border-white outline-none pr-5 pl-1 pt-3 lg:text-lg text-white font-bold shadow-black placeholder-white"
             />
             <input
-              type="number"
+              type="tel"
+              pattern="\d{10}"
               placeholder="Phone number"
               required
               minLength={10}
