@@ -8,11 +8,29 @@ import { cardImagesData } from '../context/imageData';
 const Home = () => {
   const navigate = useNavigate();
 
+  const containerVariants = {
+    initial: {},
+    animate: {
+      transition: {
+        staggerChildren: 0.2,
+      },
+    },
+  }
+
   const fadeUp = {
-    initial: { opacity: 0, y: 40 },
+    initial: { opacity: 0, y: 20 },
     animate: { opacity: 1, y: 0 },
-    transition: { duration: 0.6 }
-  };
+  }
+
+  const childVariants = {
+    initial: { opacity: 0, scale: 0.8 },
+    animate: {
+      opacity: 1,
+      scale: 1,
+      transition: { duration: 0.3, ease: 'easeOut' },
+    },
+  }
+
 
   return (
     <motion.div
@@ -107,30 +125,30 @@ const Home = () => {
 
       {/* More Reasons to Join */}
       <motion.section
-        className='flex flex-col items-center justify-center p-3 mx-auto w-full h-full'
+        className="flex flex-col items-center justify-center p-3 mx-auto w-full h-full"
+        variants={containerVariants}
         initial="initial"
-        whileInView="animate"
-        viewport={{ once: true }}
-        transition={{ staggerChildren: 0.2 }}
-        variants={fadeUp}
+        animate="animate"
       >
-        <motion.span className="heading text-2xl lg:text-[2.5em] font-bold mb-4 text-white">
+        <motion.span
+          className="heading text-2xl lg:text-[2.5em] font-bold mb-4 text-white"
+          variants={fadeUp}
+        >
           More Reasons to Join
         </motion.span>
+
         <div className="grid grid-cols-2 grid-rows-2 place-content-center items-center justify-center gap-8 lg:flex lg:gap-8 lg:flex-row text-xs lg:text-lg">
           {[
             'Cancel or switch plans anytime',
             'Watch on any device',
             'Exclusive content',
-            'No ads'
+            'No ads',
           ].map((text, i) => (
             <motion.div
               key={i}
               className="reasons-card"
-              initial={{ opacity: 0, scale: 0.8 }}
-              whileInView={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.4, delay: i * 0.1 }}
-              viewport={{ once: true }}
+              variants={childVariants}
+              style={{ willChange: 'transform, opacity' }}
             >
               <span>{text}</span>
             </motion.div>
