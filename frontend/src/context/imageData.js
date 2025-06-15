@@ -5,7 +5,7 @@ import login2 from "../assets/svgs/login2.svg"
 import login3 from "../assets/svgs/login3.svg"
 import signup from "../assets/svgs/signup.svg"
 import welcome from "../assets/svgs/welcome.svg"
-
+import HeroBg from '../assets/images/Collagebg.jpg'
 
 const cardImagesData = [
     {
@@ -53,5 +53,6 @@ export {
     login3,
     signup,
     welcome,
+    HeroBg,
     cardImagesData
 }

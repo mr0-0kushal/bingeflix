@@ -1,35 +1,36 @@
 import { createContext, useContext, useState, useEffect } from "react";
 import axios from "axios";
 import { LOCAL_SERVER } from "../utils/constants";
-import { jwtDecode } from 'jwt-decode'
+import { jwtDecode } from 'jwt-decode';
 
 const AuthContext = createContext();
 
-// Custom hook for easy access
 export const useAuth = () => useContext(AuthContext);
 
 export const AuthProvider = ({ children }) => {
-  // axios.defaults.withCredentials = true;
   const [accessToken, setAccessToken] = useState(null);
   const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true); // ✅ New state
 
-  // Load access token from localStorage or try refreshing
-  useEffect(() => {
-    const token = localStorage.getItem('accessToken');
-    if (token) {
-      setAccessToken(token);
-      try {
-        const decoded = jwtDecode(token)
-        if (decoded.exp * 1000 < Date.now()) {
-          logout();
-        } else {
-          fetchUser(token)
-        }
-      } catch (error) {
-        logout()
+ useEffect(() => {
+  const token = localStorage.getItem('accessToken');
+  if (token) {
+    setAccessToken(token);
+    try {
+      const decoded = jwtDecode(token);
+      if (decoded.exp * 1000 < Date.now()) {
+        logout().finally(() => setLoading(false)); // Token expired
+      } else {
+        fetchUser(token).finally(() => setLoading(false)); // Token valid
       }
+    } catch (error) {
+      logout().finally(() => setLoading(false)); // Invalid token
     }
-  }, []);
+  } else {
+    setLoading(false); // No token, done loading
+  }
+}, []);
+
 
   const fetchUser = async (token) => {
     try {
@@ -54,21 +55,19 @@ export const AuthProvider = ({ children }) => {
       const { accessToken } = res.data.data;
       localStorage.setItem("accessToken", accessToken);
       setAccessToken(accessToken);
-      fetchUser(accessToken);
+      await fetchUser(accessToken);
     } catch (error) {
-      return error
+      return error;
     }
     return res;
   };
 
   const logout = async () => {
-    const token = localStorage.getItem('accessToken'); // Make sure it's not null
-
+    const token = localStorage.getItem('accessToken');
     if (!token) {
       console.warn("No token found for logout");
       return false;
     }
-
     try {
       const res = await axios.post(`${LOCAL_SERVER}/users/logout`, {}, {
         withCredentials: true,
@@ -88,7 +87,6 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-
   const refreshToken = async () => {
     try {
       const res = await axios.post(`${LOCAL_SERVER}/refresh-token`, {}, { withCredentials: true });
@@ -104,31 +102,39 @@ export const AuthProvider = ({ children }) => {
 
   const sendOTP = async (formData) => {
     try {
-      const res = await axios.post(`${LOCAL_SERVER}/users/send-otp`, formData)
-      return res
+      const res = await axios.post(`${LOCAL_SERVER}/users/send-otp`, formData);
+      return res;
     } catch (error) {
-      throw error
+      throw error;
     }
-  }
+  };
 
   const verifyOTP = async (formData) => {
     try {
-      const res = await axios.post(`${LOCAL_SERVER}/users/verify-otp`, formData, { withCredentials: true })
-      // console.log(res)
+      const res = await axios.post(`${LOCAL_SERVER}/users/verify-otp`, formData, { withCredentials: true });
       const { accessToken } = res.data.data;
       localStorage.setItem("accessToken", accessToken);
       setAccessToken(accessToken);
-      setTimeout(() => {
-        fetchUser(accessToken);
-      }, 3000)
+      await fetchUser(accessToken);
       return res;
     } catch (error) {
-      throw error
+      throw error;
     }
-  }
+  };
 
   return (
-    <AuthContext.Provider value={{ accessToken, user, login, logout, refreshToken, sendOTP, verifyOTP }}>
+    <AuthContext.Provider
+      value={{
+        accessToken,
+        user,
+        login,
+        logout,
+        refreshToken,
+        sendOTP,
+        verifyOTP,
+        loading // ✅ Provide loading state
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );
