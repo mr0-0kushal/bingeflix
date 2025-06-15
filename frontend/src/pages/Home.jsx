@@ -3,22 +3,9 @@ import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import heroPoster from '../assets/images/heroPoster.png';
 import Swiperr from '../components/Swiperr';
-import axios from 'axios';
-import { LOCAL_SERVER } from '../utils/constants';
-// import { cardImagesData } from '../context/imageData';
-// // import { cardImagesData } from '../context/imageData';
 
 const Home = () => {
   const navigate = useNavigate();
-  const [cardImagesData, setCardImagesData] = useState([])
-
-  useEffect(() => {
-    (async ()=>{
-      const res = await axios.get(`${LOCAL_SERVER}/videos`)
-      setCardImagesData(res.data.data.videos)
-    })()
-  }, []);
-
   const containerVariants = {
     initial: {},
     animate: {
@@ -130,7 +117,7 @@ const Home = () => {
           Latest Releases
         </motion.span>
         <motion.div className='w-[80%] h-full flex items-center justify-center'>
-          <Swiperr data={cardImagesData} />
+          <Swiperr/>
         </motion.div>
       </motion.section>
 
