@@ -70,10 +70,10 @@ export const AuthProvider = ({ children }) => {
     }
     try {
       const res = await axios.post(`${LOCAL_SERVER}/users/logout`, {}, {
-        withCredentials: true,
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
+        withCredentials: true
+        // headers: {
+        //   Authorization: `Bearer ${token}`
+        // }
       });
 
       localStorage.removeItem("accessToken");
