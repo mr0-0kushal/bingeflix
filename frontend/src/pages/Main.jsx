@@ -47,7 +47,7 @@ const Home = () => {
           className="absolute inset-0 w-full h-full object-cover z-0"
         />
 
-        <div className="absolute inset-0 bg-black/80 z-10" />
+        <div className="absolute inset-0 bg-black/55 z-10" />
         <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-black/10 z-10"></div>
 
         <div className="relative z-20">
@@ -75,10 +75,10 @@ const Home = () => {
             transition={{ delay: 0.6, duration: 1 }}
             className="mt-6 flex gap-4"
           >
-            <button className="flex items-center gap-2 px-5 py-2 bg-[#F2613F] text-white text-md md:text-lg font-semibold rounded-md hover:bg-[#e25132] transition-all">
+            <button className="button">
               <FaPlay /> Play
             </button>
-            <button className="flex items-center gap-2 px-5 py-2 bg-gray-700/80 text-white text-md md:text-lg font-semibold rounded-md hover:bg-gray-600 transition-all">
+            <button className="button" style={{backgroundColor: 'gray', textShadow: "none"}}>
               <FaInfoCircle /> More Info
             </button>
           </motion.div>
