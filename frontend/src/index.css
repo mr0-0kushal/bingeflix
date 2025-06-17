@@ -54,23 +54,20 @@ body {
 
 /* Button */
 .button {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem; /* 8px */
-  padding: 0.5rem 1.25rem; /* py-2 px-5 */
-  background-color: #F2613F;
-  color: white;
-  font-size: 1rem; /* Tailwind's text-md */
-  font-weight: 600;
-  border-radius: 0.375rem; /* rounded-md */
-  border: none;
+  background-color: var(--color-primary);
+  color: var(--color-white);
+  border: 1px solid var(--color-border);
+  padding: 10px 20px;
+  border-radius: 100px;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: var(--transition);
+  font-weight: bold;
   text-align: center;
   text-shadow:
-    0 0 5px #F2613F,
-    0 0 40px #F2613F,
+    0 0 5px var(--color-primary),
+    0 0 40px var(--color-primary),
     0 0 80px white;
+  font-size: 1rem;
 }
 
 /* Hover effect */
