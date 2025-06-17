@@ -53,7 +53,7 @@ const HeaderLogin = () => {
         </motion.button>
         </div>
 
-        <button className="button w-auto text-center hidden sm:flex" onClick={logOut}>
+        <button className="button w-auto text-center hidden sm:flex" style={{border: "none", borderRadius:"8px"}}onClick={logOut}>
           LogOut
         </button>
       </div>
