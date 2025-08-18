@@ -70,10 +70,9 @@ const HeaderLogin = () => {
             transition={{ type: 'spring', stiffness: 300, damping: 30 }}
           >
             <Link to="/" className="text-white text-lg" onClick={() => setOpen(false)}>Home</Link>
-            <Link to="/movies" className="text-white text-lg" onClick={() => setOpen(false)}>Movies</Link>
-            <Link to="/web-series" className="text-white text-lg" onClick={() => setOpen(false)}>Web Series</Link>
-            <Link to="/settings" className="text-white text-lg" onClick={() => setOpen(false)}>Settings</Link>
-            <Link to="/dashboard" className="text-white text-lg" onClick={() => setOpen(false)}>Profile</Link>
+            <Link to="/" className="text-white text-lg" onClick={() => setOpen(false)}>Movies</Link>
+            <Link to="/" className="text-white text-lg" onClick={() => setOpen(false)}>Web Series</Link>
+            <Link to="/dashboard" className="text-white text-lg" onClick={() => setOpen(false)}>Dashboard</Link>
             <button
               className="mt-6 text-white border border-white px-4 py-2 rounded"
               onClick={(e) => { logOut(e); setOpen(false); }}
