@@ -124,12 +124,7 @@ export const AuthProvider = ({ children }) => {
 
   const updateProfile = async (data , token) => {
     try {
-      const res = await axios.post(`${LOCAL_SERVER}/users/update-user`, data , {
-        withCredentials: true,
-        headers: {
-          "Content-Type": "multipart/form-data"
-        }
-      });
+      const res = await axios.post(`${LOCAL_SERVER}/users/update-user`, data , {withCredentials: true});
       fetchUser(token);
     } catch (error) {
       throw error;
@@ -138,7 +133,12 @@ export const AuthProvider = ({ children }) => {
 
   const updateAvatar = async (data, token) => {
     try {
-      const res = await axios.post(`${LOCAL_SERVER}/users/update-avatar`, data, {withCredentials: true});
+      const res = await axios.post(`${LOCAL_SERVER}/users/update-avatar`, data, {
+        withCredentials: true,
+        headers: {
+          "Content-Type": "multipart/form-data"
+        }
+      });
       fetchUser(token);
     } catch (error) {
       throw error

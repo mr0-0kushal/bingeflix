@@ -316,30 +316,43 @@ const updateUserDetails = asyncHandler(async (req, res) => {
 })
 
 const updateUserAvatar = asyncHandler(async (req, res) => {
-    const localFilePath = req.file?.path
-    if (!localFilePath) {
-        throw new ApiError(400, "File required , Please upload the file!")
-    }
-    console.log(localFilePath)
-    const avatar = await uploadOnCloudinary(localFilePath)
-    console.log(avatar)
-    if (!avatar) {
-        throw new ApiError(500, "Failed uploading the image on cloudinary")
-    }
+    try {
+        const localFilePath = req.file?.buffer;
+        if (!localFilePath) {
+            throw new ApiError(400, "File required, please upload the file!");
+        }
 
-    await User.findByIdAndUpdate(req.user._id,
-        {
-            $set: {
-                avatar: avatar.url
-            }
-        },
-        { new: true }
-    )
+        console.log("Local file path:", localFilePath);
 
-    return res.status(200).json(
-        new ApiResponse(200, { "avatarURL": avatar.url }, "Image updated successfully")
-    )
-})
+        const avatar = await uploadOnCloudinary(localFilePath);
+
+        if (!avatar || avatar instanceof Error) {
+            throw new ApiError(500, "Failed uploading the image on Cloudinary");
+        }
+
+        await User.findByIdAndUpdate(
+            req.user._id,
+            {
+                $set: {
+                    avatar: avatar.secure_url || avatar.url, // Cloudinary returns secure_url
+                },
+            },
+            { new: true }
+        );
+
+        return res.status(200).json(
+            new ApiResponse(
+                200,
+                { avatarURL: avatar.secure_url || avatar.url },
+                "Image updated successfully"
+            )
+        );
+    } catch (error) {
+        console.error("Update avatar error:", error);
+        throw new ApiError(500, error.message || "Something went wrong while updating avatar");
+    }
+});
+
 
 const sendUserOTP = asyncHandler(async (req, res) => {
     const { email, phone, username } = req.body
