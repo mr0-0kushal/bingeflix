@@ -12,7 +12,7 @@ dotenv.config()
 const app = Express();
 
 // For parsing application/json
-app.use(Express.json({limit: "15kb"}));
+app.use(Express.json({limit: "30mb"}));
 // For ensuring that the server can accept requests from other domains
 app.use(cors({
     origin: process.env.FRONTEND_URL,
@@ -20,7 +20,7 @@ app.use(cors({
     allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
 }));
 //For ensuring taking request from encoded url also.
-app.use(urlencoded({extended:true, limit: "20kb"}));
+app.use(urlencoded({extended:true, limit: "30mb"}));
 //Cookie parser
 app.use(cookieParser())
 // For serving static files like images, CSS files, and JavaScript files
