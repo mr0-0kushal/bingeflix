@@ -51,13 +51,20 @@ const Profile = () => {
 
   const handleAvatarSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
     if (!avatarFile) return;
-    const Data = new FormData();
-    Data.append("avatar", avatarFile);
-    console.log(Data);
-    await updateAvatar(Data);
-    setIsEditingAvatar(false);
-    setAvatarFile(null);
+    try {
+      const Data = new FormData();
+      Data.append("avatar", avatarFile);
+      console.log(Data);
+      await updateAvatar(Data);
+      setIsEditingAvatar(false);
+      setAvatarFile(null);
+    } catch (error) {
+      console.error("Error updating profile:",error)
+    }finally{
+      setLoading(false);
+    }
   };
   // console.log(avatarPreview);
 
@@ -108,9 +115,10 @@ const Profile = () => {
               <div className="flex space-x-3">
                 <button
                   type="submit"
+                  disabled={loading}
                   className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition"
                 >
-                  Save
+                  {loading ? "Saving..." : "Save"}
                 </button>
                 <button
                   type="button"
