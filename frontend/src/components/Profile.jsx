@@ -56,7 +56,6 @@ const Profile = () => {
     try {
       const Data = new FormData();
       Data.append("avatar", avatarFile);
-      console.log(Data);
       await updateAvatar(Data);
       setIsEditingAvatar(false);
       setAvatarFile(null);
