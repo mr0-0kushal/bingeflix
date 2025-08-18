@@ -34,7 +34,8 @@ const userSchema = new Schema({
         type:String
     },
     address: {
-        type: String
+        type: String,
+        default: ''
     },
     refreshToken: {
         type: String

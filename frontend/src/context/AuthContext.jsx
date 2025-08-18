@@ -122,6 +122,24 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  const updateProfile = async (data , token) => {
+    try {
+      const res = await axios.post(`${LOCAL_SERVER}/users/update-user`, data , {withCredentials: true});
+      fetchUser(token);
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  const updateAvatar = async (data, token) => {
+    try {
+      const res = await axios.post(`${LOCAL_SERVER}/users/update-avatar`, data, {withCredentials: true});
+      fetchUser(token);
+    } catch (error) {
+      throw error
+    }
+  }
+
   return (
     <AuthContext.Provider
       value={{
@@ -132,6 +150,8 @@ export const AuthProvider = ({ children }) => {
         refreshToken,
         sendOTP,
         verifyOTP,
+        updateProfile,
+        updateAvatar,
         loading // ✅ Provide loading state
       }}
     >
