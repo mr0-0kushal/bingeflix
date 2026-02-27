@@ -47,7 +47,8 @@ const SignUp = () => {
         username: username,
         email: email,
         password: password,
-        phone: `${code}${phone}`
+        phone: `${code}${phone}`,
+        role: 'user'
       }
       await axios.post(`${LOCAL_SERVER}/users/register`, formData)
       await new Promise((resolve) => setTimeout(resolve, 2000));

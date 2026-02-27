@@ -33,10 +33,10 @@ const generateAccessAndRefreshTokens = async (userId) => {
 
 const registerUser = asyncHandler(async (req, res) => {
     // get users details
-    const { fullname, username, email, password, phone } = req.body
+    const { fullname, username, email, password, phone, role } = req.body
     // validate - not empty
     if (
-        [fullname, username, email, password, phone].some((field) => field?.trim() === "")
+        [fullname, username, email, password, phone, role].some((field) => field?.trim() === "")
     ) {
         return res.status(400)
             .json(
@@ -64,17 +64,17 @@ const registerUser = asyncHandler(async (req, res) => {
     }
 
     // send mail
-    const isEmailSended = await welcomeMail(email, fullname)
+    // const isEmailSended = await welcomeMail(email, fullname)
     // console.log(isEmailSended)
-    if (!isEmailSended) {
-        return res
-            .status(500)
-            .json({
-                message: isEmailSended
-            },
-                new ApiError(500, {}, "Email not sended, internal server error")
-            )
-    }
+    // if (!isEmailSended) {
+    //     return res
+    //         .status(500)
+    //         .json({
+    //             message: isEmailSended
+    //         },
+    //             new ApiError(500, {}, "Email no sended, internal server error")
+    //         )
+    // }
 
     // const response = await sendRegisterSMS(phone, fullname)
     // if (!response.data.return) {
@@ -91,7 +91,8 @@ const registerUser = asyncHandler(async (req, res) => {
         phone,
         password,
         avatar: "https://img.myloview.com/stickers/default-avatar-profile-icon-vector-social-media-user-image-700-240336019.jpg",
-        refreshToken: ""
+        refreshToken: "",
+        role
     })
 
     // remove password and refresh token from response
@@ -123,10 +124,6 @@ const registerUser = asyncHandler(async (req, res) => {
 
     return res.status(201).json(
         new ApiResponse(201, userCreated, "User Registered Successfully"),
-        {
-            // SMS: response.data,
-            Email: isEmailSended
-        }
     )
 })
 
