@@ -9,9 +9,13 @@ import {
     sendUserOTP,
     updateUserAvatar,
     updateUserDetails,
-    loginWithOTP
+    loginWithOTP,
+    getAllUser,
+    getAdminAnalytics,
+    updateUserRole,
+    deleteUser
 } from "../controllers/user.controller.js";
-import { verifyJWT , verifyOTP } from "../middlewares/auth.middleware.js";
+import { verifyJWT , isAdmin, verifyOTP } from "../middlewares/auth.middleware.js";
 import { upload } from "../middlewares/multer.middleware.js"
 
 
@@ -27,5 +31,8 @@ router.route('/update-user').post(verifyJWT, updateUserDetails)
 router.route('/update-avatar').post(verifyJWT, upload.single("avatar"), updateUserAvatar)// .single("filename") -> takes single image
 router.route('/send-otp').post(sendUserOTP)
 router.route('/verify-otp').post(verifyOTP, loginWithOTP)
-
+router.route('/all-users').get(verifyJWT, isAdmin, getAllUser);
+router.route('/analytics').get(verifyJWT, isAdmin, getAdminAnalytics);
+router.route('/:id/role').put(verifyJWT, isAdmin, updateUserRole);
+router.route('/:id').delete(verifyJWT, isAdmin, deleteUser);
 export default router

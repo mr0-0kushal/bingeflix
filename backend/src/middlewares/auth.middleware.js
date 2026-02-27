@@ -26,6 +26,16 @@ export const verifyJWT = asyncHandler(async (req, __, next) => {
     }
 });
 
+export const isAdmin = (req, res, next) => {
+    if (!req.user || req.user.role !== "admin") {
+        return res.status(403).json({
+            success: false,
+            message: "Access denied. Admin only."
+        });
+    }
+    next();
+};
+
 export const verifyOTP = asyncHandler(async (req, res, next) => {
     const { otp , email, username } = req.body
     if (!otp) {

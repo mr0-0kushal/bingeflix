@@ -43,7 +43,7 @@ export const AuthProvider = ({ children }) => {
           }
         }
       );
-      setUser(res.data);
+      setUser(res.data.data);
     } catch (err) {
       console.error("User fetch failed:", err);
     }
@@ -59,7 +59,7 @@ export const AuthProvider = ({ children }) => {
     } catch (error) {
       return error;
     }
-    return res;
+    return res.data.data.user;
   };
 
   const logout = async () => {

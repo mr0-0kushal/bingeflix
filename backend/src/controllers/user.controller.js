@@ -5,10 +5,12 @@ import { ApiResponse } from '../utils/ApiResponse.js'
 import jwt from 'jsonwebtoken'
 import { client } from '../db/redis.db.js'
 import { welcomeMail, sendOTPEmail } from '../utils/nodemailer.js'
-// import { sendRegisterSMS } from '../utils/twilioSMS.js'
 import { sendRegisterSMS, sendOTPSMS } from '../utils/fast2SMS.js'
 import { generateOTP } from '../utils/otpGenerator.js'
 import { uploadOnCloudinary } from '../utils/cloudinary.js'
+import {Movie} from '../models/movie.model.js'
+import {Watchlist} from '../models/watchlist.model.js'
+
 
 const generateAccessAndRefreshTokens = async (userId) => {
     try {
@@ -362,7 +364,7 @@ const sendUserOTP = asyncHandler(async (req, res) => {
         }, "Username or email is required"))
     }
     const user = await User.findOne({
-        $or: [ { email }, { username }]
+        $or: [{ email }, { username }]
     })
     if (!user) {
         return res.status(400).json(new ApiError(400, {
@@ -446,6 +448,78 @@ const loginWithOTP = asyncHandler(async (req, res) => {
 
 })
 
+const getAllUser = asyncHandler(async (req, res) => {
+
+    const users = await User.find()
+        .select("-password -refreshToken")
+        .sort({ createdAt: -1 });
+
+    return res.status(200).json(
+        new ApiResponse(200, users, "Users fetched successfully")
+    );
+});
+
+const getAdminAnalytics = asyncHandler(async (req, res) => {
+
+    const totalUsers = await User.countDocuments();
+    const totalMovies = await Movie.countDocuments();
+    const totalWatchlists = await Watchlist.countDocuments();
+
+    const totalRatings = await Watchlist.countDocuments({
+        userRating: { $exists: true }
+    });
+
+    return res.status(200).json(
+        new ApiResponse(200, {
+            totalUsers,
+            totalMovies,
+            totalWatchlists,
+            totalRatings
+        }, "Analytics fetched successfully")
+    );
+});
+
+const updateUserRole = asyncHandler(async (req, res) => {
+    // console.log(req)
+    const { id } = req.params;
+    const { role } = req.body;
+
+    if (!["user", "admin"].includes(role)) {
+        throw new ApiError(400, "Invalid role");
+    }
+
+    const updatedUser = await User.findByIdAndUpdate(
+        id,
+        { role },
+        { new: true }
+    ).select("-password -refreshToken");
+
+    if (!updatedUser) {
+        throw new ApiError(404, "User not found");
+    }
+
+    return res.status(200).json(
+        new ApiResponse(200, updatedUser, "Role updated successfully")
+    );
+});
+
+const deleteUser = asyncHandler(async (req, res) => {
+
+    const { id } = req.params;
+
+    const deletedUser = await User.findByIdAndDelete(id);
+
+    if (!deletedUser) {
+        throw new ApiError(404, "User not found");
+    }
+
+    return res.status(200).json(
+        new ApiResponse(200, {}, "User deleted successfully")
+    );
+});
+
+
+
 
 export {
     registerUser,
@@ -457,5 +531,9 @@ export {
     updateUserDetails,
     updateUserAvatar,
     sendUserOTP,
-    loginWithOTP
+    loginWithOTP,
+    getAllUser,
+    getAdminAnalytics,
+    updateUserRole,
+    deleteUser
 }

@@ -9,29 +9,29 @@ import { FaPlay, FaInfoCircle } from 'react-icons/fa';
 import { LOCAL_SERVER } from '../utils/constants';
 
 const Home = () => {
-  const [groupedVideos, setGroupedVideos] = useState({});
+  const [groupedMovies, setGroupedMovies] = useState({});
 
   useEffect(() => {
-    const fetchVideos = async () => {
+    const fetchMovies = async () => {
       try {
-        const res = await axios.get(`${LOCAL_SERVER}/videos`);
-        const videos = res.data.data.videos;
+        const res = await axios.get(`${LOCAL_SERVER}/movie`);
+        const movies = res.data.data.movies;
         // console.log(videos);
         const genreMap = {};
-        videos.forEach(video => {
-          video.genre.forEach(g => {
+        movies.forEach(movie => {
+          movie.genre.forEach(g => {
             if (!genreMap[g]) genreMap[g] = [];
-            genreMap[g].push(video);
+            genreMap[g].push(movie);
           });
         });
 
-        setGroupedVideos(genreMap);
+        setGroupedMovies(genreMap);
       } catch (error) {
-        console.error("Error fetching videos:", error);
+        console.error("Error fetching movies:", error);
       }
     };
 
-    fetchVideos();
+    fetchMovies();
   }, []);
 
   return (
@@ -87,7 +87,7 @@ const Home = () => {
 
       {/* Dynamic Genre Sliders */}
       <div className="relative z-20 px-6 md:px-20 py-16 space-y-16 bg-black/80">
-        {Object.entries(groupedVideos).map(([genre, videos], idx) => (
+        {Object.entries(groupedMovies).map(([genre, movies], idx) => (
           <div key={idx}>
             <h2 className="text-2xl font-bold mb-4 text-[#F2613F]">{genre}</h2>
             <Swiper
@@ -102,8 +102,8 @@ const Home = () => {
               }}
               className=''
             >
-              {videos.map((video, i) => (
-                <SwiperSlide key={video._id}>
+              {movies.map((movie, i) => (
+                <SwiperSlide key={movie._id}>
                   <motion.div
                     initial={{ opacity: 0, y:10}}
                     whileInView={{ opacity: 1, y: 0 }}
@@ -112,11 +112,11 @@ const Home = () => {
                   >
                     <div className="text-center relative flex flex-col w-full h-full rounded-xl text-white items-center justify-center text-sm font-semibold">
                     <img
-                      src={video.thumbnailUrl}
-                      alt={video.title}
+                      src={movie.poster}
+                      alt={movie.title}
                       className="h-full rounded-xl -z-10"
                     />
-                    <div className='hidden p-2 absolute bg-white/60 text-[var(--color-primary)] w-full bottom-0]'>{video.title}</div>
+                    <div className='p-2 absolute bg-black/70 text-white w-full bottom-0'>{movie.title}</div>
                     </div>
                   </motion.div>
                 </SwiperSlide>

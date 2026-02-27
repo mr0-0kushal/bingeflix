@@ -14,6 +14,11 @@ import ProtectedRoute from './ProtectedRoute';
 import PublicRoutes from './PublicRoutes';
 import Dashboard from '../pages/Dashboard';
 import ScreenLoader from '../components/ScreenLoader';
+import AdminRoute from './AdminRoute';
+import AdminDashboard from '../pages/Admin/AdminDashboard';
+import Analytics from '../pages/Admin/Analytics';
+import ManageMovies from '../pages/Admin/ManageMovies';
+import ManageUsers from '../pages/Admin/ManageUsers';
 
 const Router = () => {
   const { user, loading } = useAuth();
@@ -46,9 +51,18 @@ const Router = () => {
           <ProtectedRoute><Main /></ProtectedRoute>
         } />
 
-        <Route path="/dashboard" element={
+        <Route path="/profile" element={
           <ProtectedRoute><Dashboard /></ProtectedRoute>
         } />
+
+        <Route
+          path="/dashboard"
+          element={
+            <AdminRoute>
+              <AdminDashboard />
+            </AdminRoute>
+          }
+        />
 
         <Route path="*" element={<NotFound />} />
       </Routes>

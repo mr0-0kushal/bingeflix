@@ -28,11 +28,14 @@ app.use(Express.static('public'));
 
 // Importing the routes
 import userRoute from './routes/user.route.js'
-import videoRoute from './routes/video.route.js'
+import movieRoute from './routes/movie.route.js'
+import watchList from './routes/watchlist.route.js'
 
 // Declaring routes
 app.use('/api/v1/users', userRoute)
-app.use('/api/v1/videos', videoRoute)
+app.use('/api/v1/movie', movieRoute)
+app.use('/api/v1/watchlist',watchList)
+
 
 
 // Handling routes

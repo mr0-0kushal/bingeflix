@@ -9,7 +9,7 @@ import OTPInput from './LoginWithOTP.jsx'
 import { motion, AnimatePresence } from 'framer-motion'
 
 const Login = () => {
-  const { login, sendOTP } = useAuth()
+  const { login, sendOTP, user } = useAuth()
 
   const [showPassword, setShowPassword] = useState(false)
   const [showOTP, setShowOTP] = useState(false)
@@ -66,10 +66,19 @@ const Login = () => {
       }
       setMessage({})
       const formData = { username, email, password }
-      await login(formData)
+      const res = await login(formData)
       await new Promise((res) => setTimeout(res, 2000))
       setMessage({ message: "Logged in Successfully\nRedirecting...", flag: "success" })
-      setTimeout(() => navigate("/main"), 2000)
+      setTimeout(() => {
+        if (res) {
+          if (res.role === "admin") {
+            navigate("/dashboard");
+          } else {
+            navigate("/main");
+          }
+        }
+      }, 2000)
+      // console.log(res.data.data)
     } catch (err) {
       setMessage({
         message: err?.response?.data?.message || "Something went wrong",

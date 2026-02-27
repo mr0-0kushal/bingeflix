@@ -16,7 +16,8 @@ const itemVariants = {
 
 const Profile = () => {
   const { user, updateProfile, updateAvatar } = useAuth();
-  const userData = user.data;
+  // console.log(user)
+  const userData = user;
 
   const [isEditing, setIsEditing] = useState(false);
   const [isEditingAvatar, setIsEditingAvatar] = useState(false);
@@ -144,6 +145,7 @@ const Profile = () => {
               <p className="text-gray-600">Phone: +91 {userData.phone}</p>
               <p className="text-gray-600">Username: {userData.username}</p>
               <p className="text-gray-600">Address: {userData.address}</p>
+              <p className="text-gray-600">Role: {userData.role}</p>
               <motion.button
                 whileTap={{ scale: 0.9 }}
                 className="mt-4 px-4 py-2 bg-[#F2613F] text-white rounded-lg shadow hover:bg-black transition"

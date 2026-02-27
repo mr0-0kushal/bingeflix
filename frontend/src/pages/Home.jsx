@@ -29,6 +29,24 @@ const Home = () => {
     },
   }
 
+  const Hows = [
+    {
+      title:"1. Browse Movies Freely",
+      descp:"Explore trending and popular movies without signing in."
+    },
+    {
+      title:"2. Create an Account",
+      descp:"Sign up to unlock personalized features."
+    },
+    {
+      title:"3. Build Your Watchlist",
+      descp:"Save movies and track what you want to watch next."
+    },
+    {
+      title:"4. Enjoy Smart Recommendations",
+      descp:"Get movie suggestions based on your interests."
+    }
+  ]
 
   return (
     <motion.div
@@ -37,6 +55,7 @@ const Home = () => {
       transition={{ duration: 0.6 }}
       className="flex flex-col items-center justify-center lg:justify-between min-h-screen gap-1 lg:gap-4"
     >
+      {/* Join now button */}
       <Link className='p-4 absolute top-0 right-0 lg:top-2 lg:right-3' to='/auth'>
         <motion.button
           whileHover={{ scale: 1.05 }}
@@ -74,13 +93,13 @@ const Home = () => {
           transition={{ staggerChildren: 0.3 }}
         >
           <motion.span className='text-2xl lg:text-5xl font-bold text-wrap lg:w-[500px]'>
-            Unlimited movies,TV shows, and exclusive
+            Discover Movies Worth Watching
           </motion.span>
-          <motion.span className='text-md lg:text-2xl font-semibold text-wrap'>
-            Start for just ₹99. Cancel at anytime.
+          <motion.span className='text-md lg:text-2xl font-semibold text-wrap w-[50%]'>
+            Explore trending, top-rated, and upcoming movies from across the world — all in one place.
           </motion.span>
 
-          <motion.form
+          {/* <motion.form
             className='w-full h-full flex flex-col lg:flex-row justify-center items-center gap-2 lg:gap-3'
             onSubmit={(e) => {
               e.preventDefault();
@@ -96,10 +115,11 @@ const Home = () => {
             >
               Get Started →
             </motion.button>
-          </motion.form>
+          </motion.form> */}
 
-          <motion.span className='text-wrap w-full'>
-            All in one place. Dive into the world of stories that never stop. From epic blockbusters to binge-worthy originals — experience entertainment like never before.
+          <motion.span className='text-wrap w-[70%]'>
+            Your ultimate destination for browsing movies, checking ratings, and discovering what to watch next.
+            Sign in to personalize your experience and build your own watchlist.
           </motion.span>
         </motion.div>
       </motion.section>
@@ -117,12 +137,41 @@ const Home = () => {
           Latest Releases
         </motion.span>
         <motion.div className='w-[80%] h-full flex items-center justify-center'>
-          <Swiperr/>
+          <Swiperr />
         </motion.div>
       </motion.section>
 
-      {/* More Reasons to Join */}
+      {/* How it works */}
       <motion.section
+        className="flex flex-col items-center justify-center p-3 mx-auto w-full h-full"
+        variants={containerVariants}
+        initial="initial"
+        animate="animate"
+      >
+        <motion.span
+          className="heading text-2xl lg:text-[2.5em] font-bold mb-4 text-white"
+          variants={fadeUp}
+        >
+          How it Works
+        </motion.span>
+
+        <div className="grid grid-cols-2 grid-rows-2 place-content-center items-center justify-center gap-8 lg:flex lg:gap-8 lg:flex-row text-xs lg:text-lg">
+          {Hows.map((item, i) => (
+            <motion.div
+              key={i}
+              className="how-card"
+              variants={childVariants}
+              style={{ willChange: 'transform, opacity' }}
+            >
+              <h4>{item.title}</h4>
+              <span>{item.descp}</span>
+            </motion.div>
+          ))}
+        </div>
+      </motion.section>
+
+      {/* More Reasons to Join */}
+      {/* <motion.section
         className="flex flex-col items-center justify-center p-3 mx-auto w-full h-full"
         variants={containerVariants}
         initial="initial"
@@ -152,7 +201,8 @@ const Home = () => {
             </motion.div>
           ))}
         </div>
-      </motion.section>
+      </motion.section> */}
+
     </motion.div>
   );
 };

@@ -1,4 +1,4 @@
-import mongoose , {Schema} from 'mongoose';
+import mongoose, { Schema } from 'mongoose';
 // import mongooseAggregatePaginate from 'mongoose-aggregate-paginate-v2'
 import jwt from 'jsonwebtoken'
 import bcrypt from 'bcrypt'
@@ -6,70 +6,77 @@ import bcrypt from 'bcrypt'
 const userSchema = new Schema({
     fullname: {
         type: String,
-        required:true,
+        required: true,
     },
     username: {
-        type:String,
-        unique:true,
-        lowercase:true,
+        type: String,
+        unique: true,
+        lowercase: true,
         trim: true,
-        required:true,
+        required: true,
         index: true
     },
     email: {
         type: String,
-        required:true,
-        unique:true
+        required: true,
+        unique: true
     },
     password: {
         type: String,
-        required:true
+        required: true
     },
     phone: {
         type: String,
         required: true,
-        unique:true
+        unique: true
     },
-    avatar:{
-        type:String
+    avatar: {
+        type: String
     },
     address: {
         type: String,
         default: ''
     },
+    role: {
+        type: String,
+        enum: ["user", "admin"],
+        default: "user",
+        index: true
+    },
     refreshToken: {
         type: String
     }
 },
-{
-    timestamps: true
-}
+    {
+        timestamps: true
+    }
 )
 
 // userSchema.plugin(mongooseAggregatePaginate)
 
 //Hashing of the password just before save
 userSchema.pre('save', async function (next) {
-    if(!this.isModified("password")){
+    if (!this.isModified("password")) {
         return next();
     }
-    this.password = await bcrypt.hash(this.password,10)
+    this.password = await bcrypt.hash(this.password, 10)
     next()
 })
 
 //Comparing the hashed password with userInput password
-userSchema.methods.isPasswordCorrect = async function (password){
-    return await bcrypt.compare(password,this.password);
+userSchema.methods.isPasswordCorrect = async function (password) {
+    return await bcrypt.compare(password, this.password);
 }
 
 //Generating Token Access and Refresh using JWT.
-userSchema.methods.generateAccessToken = function (){
+userSchema.methods.generateAccessToken = function () {
     return jwt.sign(
         {
             _id: this.id,
             email: this.email,
             username: this.username,
-            fullname: this.fullname
+            fullname: this.fullname,
+            role: this.role
         },
         process.env.ACCESS_TOKEN_SECRET,
         {
@@ -77,7 +84,7 @@ userSchema.methods.generateAccessToken = function (){
         }
     )
 }
-userSchema.methods.generateRefreshToken = function (){
+userSchema.methods.generateRefreshToken = function () {
     return jwt.sign(
         {
             _id: this.id

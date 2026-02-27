@@ -26,7 +26,7 @@ const Dashboard = () => {
             className="w-40 md:w-64 bg-[var(--color-primary)] text-white font-bold flex flex-col fixed md:static z-20 top-27 p-2 md:px-2 h-auto md:h-full rounded-r-2xl shadow-xl"
           >
             <h2 className="md:text-2xl md:font-bold md:p-4 md:mb-3">
-              Dashboard
+              Profile
             </h2>
             <nav className="flex-1">
               {menuItems.map((item) => (
