@@ -5,12 +5,15 @@ import { LuTvMinimalPlay, LuSettings } from "react-icons/lu";
 import { FaUserAstronaut } from "react-icons/fa";
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom'; // ✅ Import Link
+import { useAuth } from '../context/AuthContext';
+
+const {user} = useAuth();
 
 const navItems = [
   { icon: <RiSearch2Line />, label: "Search", path: "/" },
   { icon: <MdLocalMovies />, label: "Movies", path: "/" },
   { icon: <LuTvMinimalPlay />, label: "TV Shows", path: "/" },
-  { icon: <FaUserAstronaut />, label: "Dashboard", path: "/dashboard" },
+  { icon: <FaUserAstronaut />, label: "Dashboard", path: (user.role == 'user') ? '/profile' : 'dashboard'  },
 ];
 
 const containerVariants = {
