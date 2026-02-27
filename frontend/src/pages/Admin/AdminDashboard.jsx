@@ -1,16 +1,18 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { User, Settings, Video, LogOut, Menu } from "lucide-react";
+import { User, Settings, Video, TrendingUp, Menu } from "lucide-react";
 import ManageMovies from "./ManageMovies";
 import Analytics from "./Analytics";
 import ManageUsers from "./ManageUsers";
+import Profile from "../../components/Profile";
 
 const Dashboard = () => {
-    const [activeSection, setActiveSection] = useState("Board");
+    const [activeSection, setActiveSection] = useState("Profile");
     const [sidebarOpen, setSidebarOpen] = useState(false);
 
     const menuItems = [
-        { id: "Board", label: "Analytics", icon: <Settings size={20} /> },
+        { id: "Profile", label: "Profile", icon: <Settings size={20} /> },
+        { id: "Board", label: "Analytics", icon: <TrendingUp size={20} /> },
         { id: "Movies", label: "Manage Movies", icon: <Video size={20} /> },
         { id: "Users", label: "Manage Users", icon: <User size={20} /> },
     ];
@@ -82,6 +84,10 @@ const Dashboard = () => {
 
                     {activeSection === "Users" && (
                         <ManageUsers></ManageUsers>
+                    )}
+
+                    {activeSection === "Profile" && (
+                        <Profile></Profile>
                     )}
                 </motion.div>
             </div>
