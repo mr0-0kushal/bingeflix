@@ -14,8 +14,8 @@ const Swiperr = () => {
     const [data, setData] = useState([])
     useEffect(() => {
         (async () => {
-            const res = await axios.get(`${LOCAL_SERVER}/videos`)
-            setData(res.data.data.videos)
+            const res = await axios.get(`${LOCAL_SERVER}/movie/`)
+            setData(res.data.data.movies)
         })()
     }, [data]);
     return (
@@ -47,7 +47,7 @@ const Swiperr = () => {
                         key={index}
                         className="flex flex-col items-center bg-transparent p-4 rounded-lg relative cursor-pointer"
                     >
-                        <img src={item.thumbnailUrl} alt={item.title} className="w-full h-full object-cover rounded-md mb-2 swiper-image" />
+                        <img src={item.poster} alt={item.title} className="w-full h-full object-cover rounded-md mb-2 swiper-image" />
                         <div className='absolute bottom-0 w-full h-[7vh] lg:h-[10vh] bg-black opacity-[0.5]' />
                         <h3 className="text-white font-semibold text-md lg:text-lg mt-2 absolute left-7 bottom-8 lg:left-10 lg:bottom-8">{item.title}</h3>
                     </SwiperSlide>
