@@ -16,14 +16,43 @@ const Main = () => {
   const [groupedMovies, setGroupedMovies] = useState({});
   const [watchlistMap, setWatchlistMap] = useState({});
   const [actionMovieId, setActionMovieId] = useState("");
+  const [searchTitle, setSearchTitle] = useState("");
+  const [searchYear, setSearchYear] = useState("");
+  const [searchLoading, setSearchLoading] = useState(false);
+  const [searchedMovie, setSearchedMovie] = useState(null);
   const [message, setMessage] = useState({ message: "", flag: "" });
+
+  const upsertMovieIntoGroups = (movie) => {
+    if (!movie?._id) return;
+
+    setGroupedMovies((prev) => {
+      const next = { ...prev };
+      const genres = Array.isArray(movie.genre) && movie.genre.length ? movie.genre : ["General"];
+
+      genres.forEach((genre) => {
+        const existing = next[genre] || [];
+        const index = existing.findIndex((m) => m._id === movie._id);
+        if (index === -1) {
+          next[genre] = [movie, ...existing];
+          return;
+        }
+        const updated = [...existing];
+        updated[index] = { ...updated[index], ...movie };
+        next[genre] = updated;
+      });
+
+      return next;
+    });
+  };
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         const [moviesRes, watchlistRes] = await Promise.all([
-          axios.get(`${LOCAL_SERVER}/movie`),
-          getWatchlist({ page: 1, limit: 50, sort: "latest" }),
+          axios.get(`${LOCAL_SERVER}/movie`, {
+            params: { page: 1, limit: 1000 }
+          }),
+          getWatchlist({ page: 1, limit: 200, sort: "latest" }),
         ]);
 
         const movies = moviesRes?.data?.data?.movies || [];
@@ -88,6 +117,39 @@ const Main = () => {
     }
   };
 
+  const handleSearchMovie = async (e) => {
+    e.preventDefault();
+    if (!searchTitle.trim()) {
+      setMessage({ message: "Please enter a movie title", flag: "warning" });
+      return;
+    }
+
+    try {
+      setSearchLoading(true);
+      const res = await axios.get(`${LOCAL_SERVER}/movie/search`, {
+        params: {
+          title: searchTitle.trim(),
+          year: searchYear.trim()
+        }
+      });
+
+      const movie = res?.data?.data;
+      setSearchedMovie(movie || null);
+      if (movie) {
+        upsertMovieIntoGroups(movie);
+      }
+      setMessage({ message: "Movie found", flag: "success" });
+    } catch (error) {
+      setSearchedMovie(null);
+      setMessage({
+        message: error?.response?.data?.message || "Movie not found",
+        flag: "error"
+      });
+    } finally {
+      setSearchLoading(false);
+    }
+  };
+
   return (
     <div className="w-full bg-black text-white overflow-hidden">
       <div className="relative z-20 h-full sm:h-screen flex flex-col my-auto justify-center py-30 sm:py-2 px-6 md:px-20">
@@ -119,14 +181,41 @@ const Main = () => {
             transition={{ delay: 0.3, duration: 1 }}
             className="mt-4 text-lg md:text-xl max-w-2xl text-gray-300"
           >
-            Browse by genre, add titles in one click, and manage what you watched, rated, or want to watch next.
+            Search any movie, even if it is not already in database, get details, then add it to watchlist.
           </motion.p>
+
+          <form
+            onSubmit={handleSearchMovie}
+            className="mt-6 flex flex-col md:flex-row gap-3 max-w-3xl"
+          >
+            <input
+              type="text"
+              value={searchTitle}
+              onChange={(e) => setSearchTitle(e.target.value)}
+              placeholder="Search any movie title..."
+              className="flex-1 rounded-lg bg-black/80 border border-white/30 px-4 py-2 outline-none focus:border-[#F2613F]"
+            />
+            <input
+              type="text"
+              value={searchYear}
+              onChange={(e) => setSearchYear(e.target.value)}
+              placeholder="Year (optional)"
+              className="w-full md:w-44 rounded-lg bg-black/80 border border-white/30 px-4 py-2 outline-none focus:border-[#F2613F]"
+            />
+            <button
+              type="submit"
+              disabled={searchLoading}
+              className="rounded-lg bg-[#F2613F] text-white px-5 py-2 font-bold hover:opacity-90 transition"
+            >
+              {searchLoading ? "Searching..." : "Search Movie"}
+            </button>
+          </form>
 
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.5 }}
-            className="mt-6"
+            className="mt-4"
           >
             <Link
               to="/watchlist"
@@ -137,6 +226,48 @@ const Main = () => {
           </motion.div>
         </div>
       </div>
+
+      {searchedMovie && (
+        <section className="relative z-20 px-6 md:px-20 pb-6">
+          <div className="rounded-2xl border border-[#F2613F]/40 bg-[#111]/90 p-4 md:p-5">
+            <h2 className="text-2xl font-black text-[#F2613F] mb-3">Search Result</h2>
+            <div className="flex flex-col sm:flex-row gap-4">
+              <img src={searchedMovie.poster} alt={searchedMovie.title} className="w-40 h-56 rounded object-cover" />
+              <div className="flex-1">
+                <Link to={`/movie/${searchedMovie._id}`} className="text-2xl font-extrabold hover:text-[#F2613F] transition">
+                  {searchedMovie.title}
+                </Link>
+                <p className="text-sm text-gray-300 mt-1">{searchedMovie.year || "N/A"} | {searchedMovie.runtime || "N/A"}</p>
+                <p className="text-sm text-gray-300 mt-3 line-clamp-4">{searchedMovie.plot || "No story available."}</p>
+                <div className="mt-4 flex gap-2">
+                  <button
+                    type="button"
+                    onClick={() => handleWatchlistToggle(searchedMovie._id)}
+                    disabled={actionMovieId === searchedMovie._id}
+                    className={`rounded-lg px-4 py-2 font-bold border ${
+                      watchlistMap[searchedMovie._id]
+                        ? "bg-[#F2613F] border-[#F2613F]"
+                        : "bg-black border-white/40"
+                    }`}
+                  >
+                    {actionMovieId === searchedMovie._id
+                      ? "..."
+                      : watchlistMap[searchedMovie._id]
+                      ? "In Watchlist"
+                      : "Add To Watchlist"}
+                  </button>
+                  <Link
+                    to={`/movie/${searchedMovie._id}`}
+                    className="rounded-lg px-4 py-2 font-bold border border-white/40 bg-black hover:border-[#F2613F] transition"
+                  >
+                    Open Details
+                  </Link>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+      )}
 
       <div className="relative z-20 px-6 md:px-20 py-16 space-y-16 bg-black/80">
         {Object.entries(groupedMovies).map(([genre, movies], idx) => (
