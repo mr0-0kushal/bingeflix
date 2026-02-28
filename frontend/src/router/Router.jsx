@@ -19,6 +19,8 @@ import AdminDashboard from '../pages/Admin/AdminDashboard';
 import Analytics from '../pages/Admin/Analytics';
 import ManageMovies from '../pages/Admin/ManageMovies';
 import ManageUsers from '../pages/Admin/ManageUsers';
+import Watchlist from '../pages/Watchlist';
+import MovieDetails from '../pages/MovieDetails';
 
 const Router = () => {
   const { user, loading } = useAuth();
@@ -53,6 +55,14 @@ const Router = () => {
 
         <Route path="/profile" element={
           <ProtectedRoute><Dashboard /></ProtectedRoute>
+        } />
+
+        <Route path="/watchlist" element={
+          <ProtectedRoute><Watchlist /></ProtectedRoute>
+        } />
+
+        <Route path="/movie/:id" element={
+          <ProtectedRoute><MovieDetails /></ProtectedRoute>
         } />
 
         <Route

@@ -21,7 +21,7 @@ const generateAccessAndRefreshTokens = async (userId) => {
         const refreshToken = user.generateRefreshToken()
         // update user with refresh token and save it
         user.refreshToken = refreshToken
-        user.save({
+        await user.save({
             validateBeforeSave: false
         })
         // return tokens
@@ -244,16 +244,16 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
             secure: true
         }
 
-        const { accessToken, newRefreshToken } = await generateAccessAndRefreshTokens(user._id)
+        const { accessToken, refreshToken } = await generateAccessAndRefreshTokens(user._id)
 
         return res
             .status(200)
             .cookie("accessToken", accessToken, options)
-            .cookie("refreshToken", newRefreshToken, options)
+            .cookie("refreshToken", refreshToken, options)
             .json(
                 new ApiResponse(
                     200,
-                    { accessToken, refreshToken: newRefreshToken },
+                    { accessToken, refreshToken },
                     "Access token refreshed"
                 )
             )

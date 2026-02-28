@@ -30,7 +30,7 @@ const OTPInput = ({ email, username, onSuccess }) => {
     if (!canResend) return;
     setLoading(true);
     try {
-      await sendOTP({ emails: email, username });
+      await sendOTP({ email, username });
       setMessage({ message: "OTP resent successfully", flag: "success" });
       setTimer(120);
     } catch (err) {

@@ -23,7 +23,7 @@ const HeaderLogin = () => {
   });
   const navigate = useNavigate();
 
-  const logOut = (e) => {
+  const logOut = () => {
     setMessage({
       message: "User Logged out",
       flag: "success"
@@ -69,13 +69,19 @@ const HeaderLogin = () => {
             exit="exit"
             transition={{ type: 'spring', stiffness: 300, damping: 30 }}
           >
-            <Link to="/" className="text-white text-lg" onClick={() => setOpen(false)}>Home</Link>
-            <Link to="/" className="text-white text-lg" onClick={() => setOpen(false)}>Movies</Link>
-            <Link to="/" className="text-white text-lg" onClick={() => setOpen(false)}>Web Series</Link>
-            <Link to="/dashboard" className="text-white text-lg" onClick={() => setOpen(false)}>Dashboard</Link>
+            <Link to="/main" className="text-white text-lg" onClick={() => setOpen(false)}>Home</Link>
+            <Link to="/main" className="text-white text-lg" onClick={() => setOpen(false)}>Browse Movies</Link>
+            <Link to="/watchlist" className="text-white text-lg" onClick={() => setOpen(false)}>My Watchlist</Link>
+            <Link
+              to={user?.role === "admin" ? "/dashboard" : "/profile"}
+              className="text-white text-lg"
+              onClick={() => setOpen(false)}
+            >
+              Dashboard
+            </Link>
             <button
               className="mt-6 text-white border border-white px-4 py-2 rounded"
-              onClick={(e) => { logOut(e); setOpen(false); }}
+              onClick={() => { logOut(); setOpen(false); }}
             >
               Log Out
             </button>

@@ -1,42 +1,95 @@
-import React, { useEffect, useState } from 'react';
-import { motion } from 'framer-motion';
-import { Swiper, SwiperSlide } from 'swiper/react';
-import { Autoplay } from 'swiper/modules';
-import 'swiper/css';
-import axios from 'axios';
-import { HeroBg } from '../context/imageData';
-import { FaPlay, FaInfoCircle } from 'react-icons/fa';
-import { LOCAL_SERVER } from '../utils/constants';
+import React, { useEffect, useState } from "react";
+import { motion } from "framer-motion";
+import { Link } from "react-router-dom";
+import { Swiper, SwiperSlide } from "swiper/react";
+import { Autoplay } from "swiper/modules";
+import "swiper/css";
+import axios from "axios";
+import { HeroBg } from "../context/imageData";
+import { LOCAL_SERVER } from "../utils/constants";
+import { useAuth } from "../context/AuthContext";
+import Toast from "../components/Toast";
 
-const Home = () => {
+const Main = () => {
+  const { getWatchlist, addToWatchlist, removeFromWatchlist } = useAuth();
+
   const [groupedMovies, setGroupedMovies] = useState({});
+  const [watchlistMap, setWatchlistMap] = useState({});
+  const [actionMovieId, setActionMovieId] = useState("");
+  const [message, setMessage] = useState({ message: "", flag: "" });
 
   useEffect(() => {
-    const fetchMovies = async () => {
+    const fetchData = async () => {
       try {
-        const res = await axios.get(`${LOCAL_SERVER}/movie`);
-        const movies = res.data.data.movies;
-        // console.log(videos);
+        const [moviesRes, watchlistRes] = await Promise.all([
+          axios.get(`${LOCAL_SERVER}/movie`),
+          getWatchlist({ page: 1, limit: 50, sort: "latest" }),
+        ]);
+
+        const movies = moviesRes?.data?.data?.movies || [];
         const genreMap = {};
-        movies.forEach(movie => {
-          movie.genre.forEach(g => {
+
+        movies.forEach((movie) => {
+          const genres = Array.isArray(movie.genre) && movie.genre.length ? movie.genre : ["General"];
+          genres.forEach((g) => {
             if (!genreMap[g]) genreMap[g] = [];
             genreMap[g].push(movie);
           });
         });
 
+        const map = {};
+        (watchlistRes?.items || []).forEach((item) => {
+          const movieId = item?.movie?._id || item?.movie;
+          if (movieId) {
+            map[movieId] = item;
+          }
+        });
+
         setGroupedMovies(genreMap);
+        setWatchlistMap(map);
       } catch (error) {
-        console.error("Error fetching movies:", error);
+        console.error("Error fetching movies/watchlist:", error);
       }
     };
 
-    fetchMovies();
+    fetchData();
   }, []);
+
+  const handleWatchlistToggle = async (movieId) => {
+    if (!movieId || actionMovieId) return;
+    setActionMovieId(movieId);
+
+    try {
+      const existing = watchlistMap[movieId];
+
+      if (existing) {
+        await removeFromWatchlist(existing._id);
+        setWatchlistMap((prev) => {
+          const next = { ...prev };
+          delete next[movieId];
+          return next;
+        });
+        setMessage({ message: "Removed from watchlist", flag: "success" });
+      } else {
+        const added = await addToWatchlist(movieId);
+        setWatchlistMap((prev) => ({
+          ...prev,
+          [movieId]: added,
+        }));
+        setMessage({ message: "Added to watchlist", flag: "success" });
+      }
+    } catch (error) {
+      setMessage({
+        message: error?.response?.data?.message || "Could not update watchlist",
+        flag: "error",
+      });
+    } finally {
+      setActionMovieId("");
+    }
+  };
 
   return (
     <div className="w-full bg-black text-white overflow-hidden">
-      {/* Hero Section */}
       <div className="relative z-20 h-full sm:h-screen flex flex-col my-auto justify-center py-30 sm:py-2 px-6 md:px-20">
         <motion.img
           initial={{ opacity: 0 }}
@@ -57,35 +110,34 @@ const Home = () => {
             transition={{ duration: 1 }}
             className="text-4xl md:text-6xl font-extrabold max-w-3xl leading-tight"
           >
-            Welcome to <span className="text-[#F2613F]">BingeFlix</span><br /> Dive into unlimited entertainment.
+            Welcome to <span className="text-[#F2613F]">BingeFlix</span><br /> Build your ultimate watchlist.
           </motion.h1>
 
           <motion.p
             initial={{ y: 20, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             transition={{ delay: 0.3, duration: 1 }}
-            className="mt-4 text-lg md:text-xl max-w-xl text-gray-300"
+            className="mt-4 text-lg md:text-xl max-w-2xl text-gray-300"
           >
-            Discover your next obsession. Stream movies, TV shows, and original content — all in one place.
+            Browse by genre, add titles in one click, and manage what you watched, rated, or want to watch next.
           </motion.p>
 
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ delay: 0.6, duration: 1 }}
-            className="mt-6 flex gap-4"
+            transition={{ delay: 0.5 }}
+            className="mt-6"
           >
-            {/* <button className="flex items-center gap-2 px-5 py-2 bg-[#F2613F] text-white text-md md:text-lg font-semibold rounded-md hover:bg-[#e25132] transition-all">
-              <FaPlay /> Play
-            </button>
-            <button className="flex items-center gap-2 px-5 py-2 bg-gray-700/80 text-white text-md md:text-lg font-semibold rounded-md hover:bg-gray-600 transition-all">
-              <FaInfoCircle /> More Info
-            </button> */}
+            <Link
+              to="/watchlist"
+              className="inline-block rounded-lg bg-[#F2613F] text-white px-5 py-2 font-bold hover:opacity-90 transition"
+            >
+              Open My Watchlist
+            </Link>
           </motion.div>
         </div>
       </div>
 
-      {/* Dynamic Genre Sliders */}
       <div className="relative z-20 px-6 md:px-20 py-16 space-y-16 bg-black/80">
         {Object.entries(groupedMovies).map(([genre, movies], idx) => (
           <div key={idx}>
@@ -100,33 +152,68 @@ const Home = () => {
                 768: { slidesPerView: 3 },
                 1024: { slidesPerView: 4 },
               }}
-              className=''
             >
-              {movies.map((movie, i) => (
-                <SwiperSlide key={movie._id}>
-                  <motion.div
-                    initial={{ opacity: 0, y:10}}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    transition={{ delay: i * 0.1, duration: 0.5 }}
-                    className="w-auto h-auto rounded-xl m-3 shadow-md overflow-hidden hover:scale-105 transition-all"
-                  >
-                    <div className="text-center relative flex flex-col w-full h-full rounded-xl text-white items-center justify-center text-sm font-semibold">
-                    <img
-                      src={movie.poster}
-                      alt={movie.title}
-                      className="h-full rounded-xl -z-10"
-                    />
-                    <div className='p-2 absolute bg-black/70 text-white w-full bottom-0'>{movie.title}</div>
-                    </div>
-                  </motion.div>
-                </SwiperSlide>
-              ))}
+              {movies.map((movie, i) => {
+                const isInWatchlist = Boolean(watchlistMap[movie._id]);
+                const isActionLoading = actionMovieId === movie._id;
+
+                return (
+                  <SwiperSlide key={movie._id}>
+                    <motion.div
+                      initial={{ opacity: 0, y: 10 }}
+                      whileInView={{ opacity: 1, y: 0 }}
+                      transition={{ delay: i * 0.1, duration: 0.5 }}
+                      className="w-auto h-auto rounded-xl m-3 shadow-md overflow-hidden hover:scale-105 transition-all relative"
+                    >
+                      <button
+                        type="button"
+                        onClick={() => handleWatchlistToggle(movie._id)}
+                        disabled={isActionLoading}
+                        className={`absolute top-2 right-2 z-20 px-3 py-1 rounded-full text-xs font-bold border transition-all ${
+                          isInWatchlist
+                            ? "bg-[#F2613F] text-white border-[#F2613F]"
+                            : "bg-black/60 text-white border-white/40 hover:border-[#F2613F]"
+                        }`}
+                      >
+                        {isActionLoading ? "..." : isInWatchlist ? "In Watchlist" : "+ Watchlist"}
+                      </button>
+
+                      <Link
+                        to={`/movie/${movie._id}`}
+                        className="absolute top-2 left-2 z-20 px-3 py-1 rounded-full text-xs font-bold bg-black/60 text-white border border-white/40 hover:border-[#F2613F] transition"
+                      >
+                        Details
+                      </Link>
+
+                      <div className="text-center relative flex flex-col w-full h-full rounded-xl text-white items-center justify-center text-sm font-semibold">
+                        <Link to={`/movie/${movie._id}`} className="block h-full w-full">
+                          <img
+                            src={movie.poster}
+                            alt={movie.title}
+                            className="h-full w-full rounded-xl -z-10 object-cover"
+                          />
+                        </Link>
+                        <div className="p-2 absolute bg-black/70 text-white w-full bottom-0">
+                          <Link to={`/movie/${movie._id}`} className="text-sm font-bold hover:text-[#F2613F] transition">
+                            {movie.title}
+                          </Link>
+                          <div className="text-[11px] text-gray-300">
+                            {movie.year || "N/A"} | Rating {movie.averageRating || 0} ({movie.ratingsCount || 0})
+                          </div>
+                        </div>
+                      </div>
+                    </motion.div>
+                  </SwiperSlide>
+                );
+              })}
             </Swiper>
           </div>
         ))}
       </div>
+
+      <Toast message={message.message} flag={message.flag} />
     </div>
   );
 };
 
-export default Home;
+export default Main;
